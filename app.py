@@ -95,22 +95,36 @@ if uploaded_file is not None:
             mime="application/pdf",
         )
 #-------------------------------------SECCION ECG---------------------------------------
+# Sección ECG
 st.header("Señal ECG")
 uploaded_ecg_file = st.file_uploader("Subí tu archivo CSV de ECG", type=["csv"], key="ecg")
-df_ecg = pd.read_csv(uploaded_ecg_file)
-# Adaptá estas columnas según tu archivo CSV ECG
-if 'time' in df_ecg.columns and 'value' in df_ecg.columns:
-    df_ecg = df_ecg.rename(columns={'time': 'fecha', 'value': 'ecg'})
-elif 'timestamp' in df_ecg.columns and 'ecg' in df_ecg.columns:
-    df_ecg = df_ecg.rename(columns={'timestamp': 'fecha'})
-else:
-    st.error("No se encontraron columnas adecuadas para ECG ('time' y 'value' o 'timestamp' y 'ecg').")
 
-df_ecg['fecha'] = pd.to_datetime(df_ecg['fecha'], errors='coerce')
+if uploaded_ecg_file is not None:
+    df_ecg = pd.read_csv(uploaded_ecg_file)
+
+    # Detectar columnas válidas
+    if 'time' in df_ecg.columns and 'value' in df_ecg.columns:
+        df_ecg = df_ecg.rename(columns={'time': 'fecha', 'value': 'ecg'})
+    elif 'timestamp' in df_ecg.columns and 'ecg' in df_ecg.columns:
+        df_ecg = df_ecg.rename(columns={'timestamp': 'fecha'})
+    else:
+        st.error("No se encontraron columnas adecuadas para ECG ('time' y 'value' o 'timestamp' y 'ecg').")
+
+    df_ecg['fecha'] = pd.to_datetime(df_ecg['fecha'], errors='coerce')
     df_ecg = df_ecg.dropna(subset=['fecha']).sort_values('fecha')
 
-#Grafico interactivo ECG
-fig_ecg = go.Figure()
-fig_ecg.add_trace(go.Scatter(x=df_ecg['fecha'], y=df_ecg['ecg'], mode='lines', line=dict(color='blue', width=2)))
-fig_ecg.update_layout(title='Señal ECG', xaxis_title='Fecha y Hora', yaxis_title='ECG (mV)', template='plotly_white')
-st.plotly_chart(fig_ecg)
+    # Gráfico interactivo ECG
+    fig_ecg = go.Figure()
+    fig_ecg.add_trace(go.Scatter(
+        x=df_ecg['fecha'],
+        y=df_ecg['ecg'],
+        mode='lines',
+        line=dict(color='blue', width=2)
+    ))
+    fig_ecg.update_layout(
+        title='Señal ECG',
+        xaxis_title='Fecha y Hora',
+        yaxis_title='ECG (mV)',
+        template='plotly_white'
+    )
+    st.plotly_chart(fig_ecg)
