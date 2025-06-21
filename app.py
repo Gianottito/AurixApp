@@ -98,13 +98,13 @@ if uploaded_file is not None:
 st.header("Señal ECG")
 uploaded_ecg_file = st.file_uploader("Subí tu archivo CSV de ECG", type=["csv"], key="ecg")
 df_ecg = pd.read_csv(uploaded_ecg_file)
-    # Adaptá estas columnas según tu archivo CSV ECG
-    if 'time' in df_ecg.columns and 'value' in df_ecg.columns:
-        df_ecg = df_ecg.rename(columns={'time': 'fecha', 'value': 'ecg'})
-    elif 'timestamp' in df_ecg.columns and 'ecg' in df_ecg.columns:
-        df_ecg = df_ecg.rename(columns={'timestamp': 'fecha'})
-    else:
-        st.error("No se encontraron columnas adecuadas para ECG ('time' y 'value' o 'timestamp' y 'ecg').")
+# Adaptá estas columnas según tu archivo CSV ECG
+if 'time' in df_ecg.columns and 'value' in df_ecg.columns:
+    df_ecg = df_ecg.rename(columns={'time': 'fecha', 'value': 'ecg'})
+elif 'timestamp' in df_ecg.columns and 'ecg' in df_ecg.columns:
+    df_ecg = df_ecg.rename(columns={'timestamp': 'fecha'})
+else:
+    st.error("No se encontraron columnas adecuadas para ECG ('time' y 'value' o 'timestamp' y 'ecg').")
 
 df_ecg['fecha'] = pd.to_datetime(df_ecg['fecha'], errors='coerce')
     df_ecg = df_ecg.dropna(subset=['fecha']).sort_values('fecha')
