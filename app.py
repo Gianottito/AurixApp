@@ -14,7 +14,7 @@ def mostrar_logo(path_logo):
     st.markdown(
         f"""
         <div style="text-align: center; margin-bottom: 10px;">
-            <img src="data:image/png;base64,{encoded}" width="200"/>
+            <img src="data:image/png;base64,{encoded}" width="400"/>
         </div>
         """,
         unsafe_allow_html=True
