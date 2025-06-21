@@ -5,8 +5,23 @@ import matplotlib.pyplot as plt
 from fpdf import FPDF
 from datetime import datetime
 import tempfile
+import base64
 
-st.title("📈 Análisis de Frecuencia Cardíaca y ECG")
+#Logo AuriX
+def mostrar_logo(path_logo):
+    with open(path_logo, "rb") as image_file:
+        encoded = base64.b64encode(image_file.read()).decode()
+    st.markdown(
+        f"""
+        <div style="text-align: center; margin-bottom: 10px;">
+            <img src="data:image/png;base64,{encoded}" width="200"/>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+mostrar_logo("logoaurix.png")  
+
+st.title("📈 Análisis de Frecuencia Cardíaca")
 
 #Datos del paciente
 st.sidebar.header("🩺 Datos del paciente")
