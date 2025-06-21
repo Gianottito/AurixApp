@@ -6,7 +6,7 @@ from fpdf import FPDF
 from datetime import datetime
 import tempfile
 
-st.title("📈 Análisis de Frecuencia Cardíaca")
+st.title("📈 Análisis de Frecuencia Cardíaca y ECG")
 
 #Datos del paciente
 st.sidebar.header("🩺 Datos del paciente")
@@ -14,6 +14,7 @@ nombre_paciente = st.sidebar.text_input("Nombre del paciente")
 edad_paciente = st.sidebar.number_input("Edad", min_value=0, max_value=120, step=1)
 observaciones = st.sidebar.text_area("Observaciones médicas")
 
+#SECCION DE FRECUENCIA CARDIACA
 #Subida del archivo
 uploaded_file = st.file_uploader("Subí tu archivo CSV de Aurix", type=["csv"])
 
@@ -41,7 +42,7 @@ if uploaded_file is not None:
     - ❤️ Carga arrítmica (>70 lpm): {carga_arritmica:.2f} %
     """)
     
-    #Grafico interactivo
+    #Grafico interactivo FC
     fig = go.Figure()
     fig.add_trace(go.Scatter(x=df['fecha'], y=df['frecuencia_cardíaca'], mode='lines', line=dict(color='crimson', width=2)))
     fig.update_layout(title='Evolución de la Frecuencia Cardíaca', xaxis_title='Fecha y Hora', yaxis_title='Frecuencia (lpm)', template='plotly_white')
@@ -93,3 +94,23 @@ if uploaded_file is not None:
             file_name="informe_frecuencia_cardiaca.pdf",
             mime="application/pdf",
         )
+#-------------------------------------SECCION ECG---------------------------------------
+st.header("Señal ECG")
+uploaded_ecg_file = st.file_uploader("Subí tu archivo CSV de ECG", type=["csv"], key="ecg")
+df_ecg = pd.read_csv(uploaded_ecg_file)
+    # Adaptá estas columnas según tu archivo CSV ECG
+    if 'time' in df_ecg.columns and 'value' in df_ecg.columns:
+        df_ecg = df_ecg.rename(columns={'time': 'fecha', 'value': 'ecg'})
+    elif 'timestamp' in df_ecg.columns and 'ecg' in df_ecg.columns:
+        df_ecg = df_ecg.rename(columns={'timestamp': 'fecha'})
+    else:
+        st.error("No se encontraron columnas adecuadas para ECG ('time' y 'value' o 'timestamp' y 'ecg').")
+
+df_ecg['fecha'] = pd.to_datetime(df_ecg['fecha'], errors='coerce')
+    df_ecg = df_ecg.dropna(subset=['fecha']).sort_values('fecha')
+
+#Grafico interactivo ECG
+fig_ecg = go.Figure()
+fig_ecg.add_trace(go.Scatter(x=df_ecg['fecha'], y=df_ecg['ecg'], mode='lines', line=dict(color='blue', width=2)))
+fig_ecg.update_layout(title='Señal ECG', xaxis_title='Fecha y Hora', yaxis_title='ECG (mV)', template='plotly_white')
+st.plotly_chart(fig_ecg)
