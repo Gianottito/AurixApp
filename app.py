@@ -65,7 +65,7 @@ if uploaded_file is not None:
     pdf.set_font("Arial", 'B', 16)
     pdf.cell(0, 10, "Informe de Frecuencia Cardíaca", ln=True, align="C")
     pdf.set_font("Arial", '', 12)
-    pdf.cell(0, 10, f"Fecha de generación: {datetime.now()}", ln=True)
+    pdf.cell(0, 10, f"Fecha de generación: {datetime.now().date()}", ln=True)
     pdf.ln(5)
     #Datos de paciente
     pdf.cell(0, 10, f"Nombre del paciente: {nombre_paciente}", ln=True)
