@@ -163,7 +163,7 @@ if uploaded_ecg_file is not None:
             yaxis_title="ECG (mV)",
             template="plotly_white",
             width = 1000,
-            height=600,  # Más alto que antes para mejor visualización
+              # Más alto que antes para mejor visualización
             hovermode="x unified"
         )
         st.plotly_chart(fig_ecg, use_container_width=True)
