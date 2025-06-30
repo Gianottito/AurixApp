@@ -160,7 +160,7 @@ if uploaded_ecg_file is not None:
             xaxis=dict(
                 showgrid=True,
                 gridcolor='LightPink',
-                dtick=0.2  # líneas verticales cada 0.2 segundos
+                dtick=1  # líneas verticales cada 0.2 segundos
             ),
             yaxis=dict(
                 showgrid=True,
