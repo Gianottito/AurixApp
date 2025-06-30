@@ -136,12 +136,10 @@ if uploaded_ecg_file is not None:
         df_ecg["ecg_filtrado"] = aplicar_filtro_bandpass(df_ecg["ecg"], fs)
 
         fig_ecg = go.Figure()
-        fig_ecg.add_trace(go.Scatter(x=df_ecg["timestamp_ms"], y=df_ecg["ecg"],
-                                     name="Original", line=dict(color="gray", width=1), opacity=0.3))
         fig_ecg.add_trace(go.Scatter(x=df_ecg["timestamp_ms"], y=df_ecg["ecg_filtrado"],
                                      name="Filtrado (0.5–15 Hz)", line=dict(color="blue", width=2)))
         fig_ecg.update_layout(
-            title="Señal ECG (Filtrado para onda P)",
+            title="Señal ECG",
             xaxis_title="Tiempo [ms]",
             yaxis_title="ECG (mV)",
             template="plotly_white",
