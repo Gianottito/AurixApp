@@ -162,7 +162,8 @@ if uploaded_ecg_file is not None:
             xaxis_title="Tiempo [s]",
             yaxis_title="ECG (mV)",
             template="plotly_white",
-            height=700,  # Más alto que antes para mejor visualización
+            width = 1000,
+            height=300,  # Más alto que antes para mejor visualización
             hovermode="x unified"
         )
         st.plotly_chart(fig_ecg, use_container_width=True)
