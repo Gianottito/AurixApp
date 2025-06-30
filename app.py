@@ -121,20 +121,34 @@ def butter_bandpass(lowcut, highcut, fs, order=2):
     high = highcut / nyq
     return butter(order, [low, high], btype='band')
 
+@st.cache_data(show_spinner=False)
 def aplicar_filtro_bandpass(data, fs, lowcut=0.5, highcut=15):
     b, a = butter_bandpass(lowcut, highcut, fs)
     return filtfilt(b, a, data)
+
+def downsample(df, factor):
+    # Reduce cantidad de puntos para graficar (tomar cada 'factor' punto)
+    return df.iloc[::factor, :].reset_index(drop=True)
 
 if uploaded_ecg_file is not None:
     df_ecg = pd.read_csv(uploaded_ecg_file)
 
     if 'timestamp_ms' in df_ecg.columns and 'ecg' in df_ecg.columns:
         fs = 200  # Frecuencia de muestreo
-        df_ecg["ecg_filtrado"] = aplicar_filtro_bandpass(df_ecg["ecg"], fs)  
+
+        # Filtrado con cache para acelerar recarga
+        ecg_filtrado = aplicar_filtro_bandpass(df_ecg["ecg"], fs)
+        df_ecg["ecg_filtrado"] = ecg_filtrado
+
+        # Downsampling para graficar rápido, ej cada 10 puntos
+        factor_downsample = max(1, len(df_ecg) // 1000)  # máximo 1000 puntos graficados
+        df_plot = downsample(df_ecg[['timestamp_ms', 'ecg_filtrado']], factor_downsample)
 
         fig_ecg = go.Figure()
-        fig_ecg.add_trace(go.Scatter(x=df_ecg["timestamp_ms"], y=df_ecg["ecg_filtrado"],
-                                     name="Filtrado (0.5–15 Hz)", line=dict(color="blue", width=2)))
+        fig_ecg.add_trace(go.Scattergl(  # 'Scattergl' para mejor rendimiento con muchos puntos
+            x=df_plot["timestamp_ms"], y=df_plot["ecg_filtrado"],
+            name="Filtrado (0.5–15 Hz)", line=dict(color="blue", width=1)
+        ))
         fig_ecg.update_layout(
             title="Señal ECG",
             xaxis_title="Tiempo [ms]",
@@ -143,7 +157,7 @@ if uploaded_ecg_file is not None:
             height=500,
             hovermode="x unified"
         )
-        st.plotly_chart(fig_ecg)
+        st.plotly_chart(fig_ecg, use_container_width=True)
     else:
         st.error("Las columnas esperadas ('timestamp_ms' y 'ecg') no están presentes.")
 
