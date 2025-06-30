@@ -112,6 +112,12 @@ if uploaded_file is not None:
 #-------------------------------------SECCION ECG---------------------------------------
 from scipy.signal import butter, filtfilt
 
+import streamlit as st
+import pandas as pd
+import numpy as np
+from scipy.signal import butter, filtfilt
+import plotly.graph_objects as go
+
 st.header("Señal ECG")
 uploaded_ecg_file = st.file_uploader("Subí tu archivo CSV de ECG", type=["csv"], key="ecg")
 
@@ -127,7 +133,6 @@ def aplicar_filtro_bandpass(data, fs, lowcut=0.5, highcut=15):
     return filtfilt(b, a, data)
 
 def downsample(df, factor):
-    # Reduce cantidad de puntos para graficar (tomar cada 'factor' punto)
     return df.iloc[::factor, :].reset_index(drop=True)
 
 if uploaded_ecg_file is not None:
@@ -136,28 +141,32 @@ if uploaded_ecg_file is not None:
     if 'timestamp_ms' in df_ecg.columns and 'ecg' in df_ecg.columns:
         fs = 200  # Frecuencia de muestreo
 
-        # Filtrado con cache para acelerar recarga
+        # Convertir timestamp a segundos
+        df_ecg['timestamp_s'] = df_ecg['timestamp_ms'] / 1000.0
+
+        # Filtrado
         ecg_filtrado = aplicar_filtro_bandpass(df_ecg["ecg"], fs)
         df_ecg["ecg_filtrado"] = ecg_filtrado
 
-        # Downsampling para graficar rápido, ej cada 10 puntos
-        factor_downsample = max(1, len(df_ecg) // 1000)  # máximo 1000 puntos graficados
-        df_plot = downsample(df_ecg[['timestamp_ms', 'ecg_filtrado']], factor_downsample)
+        # Downsampling para graficar máximo 1000 puntos
+        factor_downsample = max(1, len(df_ecg) // 1000)
+        df_plot = downsample(df_ecg[['timestamp_s', 'ecg_filtrado']], factor_downsample)
 
         fig_ecg = go.Figure()
-        fig_ecg.add_trace(go.Scattergl(  # 'Scattergl' para mejor rendimiento con muchos puntos
-            x=df_plot["timestamp_ms"], y=df_plot["ecg_filtrado"],
+        fig_ecg.add_trace(go.Scattergl(
+            x=df_plot["timestamp_s"], y=df_plot["ecg_filtrado"],
             name="Filtrado (0.5–15 Hz)", line=dict(color="blue", width=1)
         ))
         fig_ecg.update_layout(
             title="Señal ECG",
-            xaxis_title="Tiempo [ms]",
+            xaxis_title="Tiempo [s]",
             yaxis_title="ECG (mV)",
             template="plotly_white",
-            height=500,
+            height=700,  # Más alto que antes para mejor visualización
             hovermode="x unified"
         )
         st.plotly_chart(fig_ecg, use_container_width=True)
     else:
         st.error("Las columnas esperadas ('timestamp_ms' y 'ecg') no están presentes.")
+
 
