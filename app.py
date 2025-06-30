@@ -110,37 +110,44 @@ if uploaded_file is not None:
             mime="application/pdf",
         )
 #-------------------------------------SECCION ECG---------------------------------------
-# Sección ECG
+import pandas as pd
+import plotly.graph_objects as go
+from scipy.signal import butter, filtfilt
+import streamlit as st
+
 st.header("Señal ECG")
 uploaded_ecg_file = st.file_uploader("Subí tu archivo CSV de ECG", type=["csv"], key="ecg")
+
+def butter_bandpass(lowcut, highcut, fs, order=2):
+    nyq = 0.5 * fs
+    low = lowcut / nyq
+    high = highcut / nyq
+    return butter(order, [low, high], btype='band')
+
+def aplicar_filtro_bandpass(data, fs, lowcut=0.5, highcut=15):
+    b, a = butter_bandpass(lowcut, highcut, fs)
+    return filtfilt(b, a, data)
 
 if uploaded_ecg_file is not None:
     df_ecg = pd.read_csv(uploaded_ecg_file)
 
-    # Detectar columnas válidas
-    df_ecg = df_ecg.rename(columns={'timestamp_ms': 'timestamp'})
-    if 'time' in df_ecg.columns and 'value' in df_ecg.columns:
-        df_ecg = df_ecg.rename(columns={'time': 'fecha', 'value': 'ecg'})
-    elif 'timestamp' in df_ecg.columns and 'ecg' in df_ecg.columns:
-        df_ecg = df_ecg.rename(columns={'timestamp': 'fecha'})
+    if 'timestamp_ms' in df_ecg.columns and 'ecg' in df_ecg.columns:
+        fs = 200  # Frecuencia de muestreo
+        df_ecg["ecg_filtrado"] = aplicar_filtro_bandpass(df_ecg["ecg"], fs)
+
+        fig_ecg = go.Figure()
+        fig_ecg.add_trace(go.Scatter(x=df_ecg["timestamp_ms"], y=df_ecg["ecg"],
+                                     name="Original", line=dict(color="gray", width=1), opacity=0.3))
+        fig_ecg.add_trace(go.Scatter(x=df_ecg["timestamp_ms"], y=df_ecg["ecg_filtrado"],
+                                     name="Filtrado (0.5–15 Hz)", line=dict(color="blue", width=2)))
+        fig_ecg.update_layout(
+            title="Señal ECG (Filtrado para onda P)",
+            xaxis_title="Tiempo [ms]",
+            yaxis_title="ECG (mV)",
+            template="plotly_white",
+            height=500,
+            hovermode="x unified"
+        )
+        st.plotly_chart(fig_ecg)
     else:
-        st.error("No se encontraron columnas adecuadas para ECG ('time' y 'value' o 'timestamp' y 'ecg').")
-
-    df_ecg['fecha'] = pd.to_datetime(df_ecg['fecha'], errors='coerce')
-    df_ecg = df_ecg.dropna(subset=['fecha']).sort_values('fecha')
-
-    # Gráfico interactivo ECG
-    fig_ecg = go.Figure()
-    fig_ecg.add_trace(go.Scatter(
-        x=df_ecg['fecha'],
-        y=df_ecg['ecg'],
-        mode='lines',
-        line=dict(color='blue', width=2)
-    ))
-    fig_ecg.update_layout(
-        title='Señal ECG',
-        xaxis_title='Fecha y Hora',
-        yaxis_title='ECG (mV)',
-        template='plotly_white'
-    )
-    st.plotly_chart(fig_ecg)
+        st.error("Las columnas esperadas ('timestamp_ms' y 'ecg') no están presentes.")
