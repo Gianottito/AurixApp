@@ -115,7 +115,6 @@ from scipy.signal import butter, filtfilt
 st.header("Señal ECG")
 uploaded_ecg_file = st.file_uploader("Subí tu archivo CSV de ECG", type=["csv"], key="ecg")
 
-# Funciones de filtrado
 def butter_bandpass(lowcut, highcut, fs, order=2):
     nyq = 0.5 * fs
     low = lowcut / nyq
@@ -126,49 +125,24 @@ def aplicar_filtro_bandpass(data, fs, lowcut=0.5, highcut=15):
     b, a = butter_bandpass(lowcut, highcut, fs)
     return filtfilt(b, a, data)
 
-# Si se sube archivo
 if uploaded_ecg_file is not None:
     df_ecg = pd.read_csv(uploaded_ecg_file)
 
-    # Verificar columnas
     if 'timestamp_ms' in df_ecg.columns and 'ecg' in df_ecg.columns:
-        fs = 200  # Frecuencia de muestreo (Hz)
+        fs = 200  # Frecuencia de muestreo
+        df_ecg["ecg_filtrado"] = aplicar_filtro_bandpass(df_ecg["ecg"], fs)  
 
-        # Filtrar señal
-        df_ecg["ecg_filtrado"] = aplicar_filtro_bandpass(df_ecg["ecg"], fs)
-
-        # Calcular tiempo en segundos
-        df_ecg["tiempo_s"] = df_ecg["timestamp_ms"] / 1000.0
-
-        # Gráfico
         fig_ecg = go.Figure()
-        fig_ecg.add_trace(go.Scatter(
-            x=df_ecg["tiempo_s"],
-            y=df_ecg["ecg_filtrado"],
-            name="Filtrado (0.5–15 Hz)",
-            line=dict(color="blue", width=2)
-        ))
-
-        # Estilo ECG con fondo cuadriculado
+        fig_ecg.add_trace(go.Scatter(x=df_ecg["timestamp_ms"], y=df_ecg["ecg_filtrado"],
+                                     name="Filtrado (0.5–15 Hz)", line=dict(color="blue", width=2)))
         fig_ecg.update_layout(
-            title="Señal ECG Filtrada (en segundos)",
-            xaxis_title="Tiempo (s)",
+            title="Señal ECG",
+            xaxis_title="Tiempo [ms]",
             yaxis_title="ECG (mV)",
             template="plotly_white",
             height=500,
-            hovermode="x unified",
-            xaxis=dict(
-                showgrid=True,
-                gridcolor='LightPink',
-                dtick=1  # líneas verticales cada 0.2 segundos
-            ),
-            yaxis=dict(
-                showgrid=True,
-                gridcolor='LightPink',
-                dtick=0.5  # líneas horizontales cada 0.5 mV
-            )
+            hovermode="x unified"
         )
-
         st.plotly_chart(fig_ecg)
     else:
         st.error("Las columnas esperadas ('timestamp_ms' y 'ecg') no están presentes.")
