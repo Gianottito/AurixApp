@@ -118,6 +118,7 @@ if uploaded_ecg_file is not None:
     df_ecg = pd.read_csv(uploaded_ecg_file)
 
     # Detectar columnas válidas
+    df_ecg = df_ecg.rename(columns={'timestamp_ms': 'timestamp'})
     if 'time' in df_ecg.columns and 'value' in df_ecg.columns:
         df_ecg = df_ecg.rename(columns={'time': 'fecha', 'value': 'ecg'})
     elif 'timestamp' in df_ecg.columns and 'ecg' in df_ecg.columns:
