@@ -141,7 +141,7 @@ elif seccion == "🧠 Señal ECG":
         if 'timestamp_ms' in df_ecg.columns and 'ecg' in df_ecg.columns:
             fs = 200
             df_ecg['timestamp_s'] = df_ecg['timestamp_ms'] / 1000.0
-            df_ecg['ecg'] = ((df_ecg['ecg'] / 4095.0) * 3300)/100  # Crudo ADC → mV
+            df_ecg['ecg'] = ((df_ecg['ecg'] / 4095.0) * 3300)/1000.0  # Crudo ADC → mV
             df_ecg["ecg_filtrado"] = aplicar_filtro_bandpass(df_ecg["ecg"], fs)
             factor_downsample = max(1, len(df_ecg) // 1000)
             df_plot = downsample(df_ecg[['timestamp_s', 'ecg_filtrado']], factor_downsample)
