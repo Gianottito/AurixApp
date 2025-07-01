@@ -139,7 +139,7 @@ elif seccion == "🧠 Señal ECG":
         df_ecg = pd.read_csv(uploaded_ecg_file)
 
         if 'timestamp_ms' in df_ecg.columns and 'ecg' in df_ecg.columns:
-            fs = 200
+            fs = 50
             df_ecg['timestamp_s'] = df_ecg['timestamp_ms'] / 1000.0
             df_ecg['ecg'] = ((df_ecg['ecg'] / 4095.0) * 3300)/1000.0  # Crudo ADC → mV
             df_ecg["ecg_filtrado"] = aplicar_filtro_bandpass(df_ecg["ecg"], fs)
