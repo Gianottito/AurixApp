@@ -139,22 +139,28 @@ elif seccion == "🧠 Señal ECG":
         df_ecg = pd.read_csv(uploaded_ecg_file)
 
         if 'timestamp_ms' in df_ecg.columns and 'ecg' in df_ecg.columns:
-            fs = 50
-            df_ecg['timestamp_s'] = df_ecg['timestamp_ms'] / 1000.0
-            df_ecg['ecg'] = ((df_ecg['ecg'] / 4095.0) * 3300)/1000.0  # Crudo ADC → mV
-            df_ecg["ecg_filtrado"] = aplicar_filtro_bandpass(df_ecg["ecg"], fs)
-            factor_downsample = max(1, len(df_ecg) // 1000)
-            df_plot = downsample(df_ecg[['timestamp_s', 'ecg_filtrado']], factor_downsample)
+            fs = 50  # Frecuencia de muestreo
 
+            # Convertir timestamp a segundos
+            df_ecg['timestamp_s'] = df_ecg['timestamp_ms'] / 1000.0
+
+            # Convertir datos crudos del ADC a voltios
+            df_ecg['ecg'] = ((df_ecg['ecg'] / 4095.0) * 3.3)
+
+            # Downsampling para mostrar máximo 1000 puntos
+            factor_downsample = max(1, len(df_ecg) // 1000)
+            df_plot = downsample(df_ecg[['timestamp_s', 'ecg']], factor_downsample)
+
+            # Gráfico
             fig_ecg = go.Figure()
             fig_ecg.add_trace(go.Scattergl(
-                x=df_plot["timestamp_s"], y=df_plot["ecg_filtrado"],
-                name="Filtrado (0.5–15 Hz)", line=dict(color="red", width=1)
+                x=df_plot["timestamp_s"], y=df_plot["ecg"],
+                name="Señal original", line=dict(color="red", width=1)
             ))
             fig_ecg.update_layout(
-                title="Señal ECG",
+                title="Señal ECG (sin filtrar)",
                 xaxis_title="Tiempo [s]",
-                yaxis_title="ECG (mV)",
+                yaxis_title="ECG (V)",
                 template="plotly_white",
                 width=1000,
                 hovermode="x unified"
@@ -162,6 +168,7 @@ elif seccion == "🧠 Señal ECG":
             st.plotly_chart(fig_ecg, use_container_width=True)
         else:
             st.error("Las columnas esperadas ('timestamp_ms' y 'ecg') no están presentes.")
+
 
 # ---------------- SECCIÓN 3: HISTORIAL ----------------
 elif seccion == "🗂️ Historial de Pacientes":
