@@ -109,7 +109,6 @@ if seccion == "📈 Frecuencia Cardíaca":
         if observaciones:
             pdf.multi_cell(0, 10, f"Observaciones: {observaciones}")
             pdf.ln(5)
-        pdf.cell(0, 10, f"Frecuencia mínima: {min_fc:.2f} lpm", ln=True)
         pdf.cell(0, 10, f"Frecuencia máxima: {max_fc:.2f} lpm", ln=True)
         pdf.cell(0, 10, f"Frecuencia promedio: {avg_fc:.2f} lpm", ln=True)
         pdf.cell(0, 10, f"Carga arrítmica (>70 lpm): {carga_arritmica:.2f} %", ln=True)
