@@ -171,7 +171,7 @@ elif seccion == "🧠 Señal ECG":
         df_ecg = pd.read_csv(uploaded_ecg_file)
 
         if 'timestamp_ms' in df_ecg.columns and 'ecg' in df_ecg.columns:
-            fs = 50  # Frecuencia de muestreo
+            fs = 200  # Frecuencia de muestreo
 
             # Convertir timestamp a segundos
             df_ecg['timestamp_s'] = df_ecg['timestamp_ms'] / 1000.0
