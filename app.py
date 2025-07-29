@@ -28,8 +28,7 @@ def mostrar_logo(path_logo):
     )
 
 mostrar_logo("logoaurix.png")
-st.markdown('<div class="titulo-centrado">Plataforma de Análisis Cardíaco</div>', unsafe_allow_html=True)
-#st.title("        Plataforma de Análisis Cardíaco")
+st.title("        Plataforma de Análisis Cardíaco")
 
 # ---------------- Sidebar para navegación ----------------
 st.sidebar.title("Navegación")
