@@ -42,7 +42,7 @@ def butter_bandpass(lowcut, highcut, fs, order=2):
     return butter(order, [low, high], btype='band')
 
 @st.cache_data(show_spinner=False)
-def aplicar_filtro_bandpass(data, fs, lowcut=0.5, highcut=15):
+def aplicar_filtro_bandpass(data, fs, lowcut=0.5, highcut=40):
     b, a = butter_bandpass(lowcut, highcut, fs)
     return filtfilt(b, a, data)
 
@@ -181,6 +181,9 @@ elif seccion == "🧠 Señal ECG":
 
             # Centrar la señal en 0
             df_ecg['ecg'] = df_ecg['ecg'] - df_ecg['ecg'].mean()
+            
+            # Aplicar filtro pasa banda (0.5 a 40 Hz)
+            df_ecg['ecg'] = aplicar_filtro_bandpass(df_ecg['ecg'], fs)
 
             # Downsampling para mostrar máximo 1000 puntos
             factor_downsample = max(1, len(df_ecg) // 1000)
@@ -193,7 +196,7 @@ elif seccion == "🧠 Señal ECG":
                 name="Señal original", line=dict(color="red", width=1)
             ))
             fig_ecg.update_layout(
-                title="Señal ECG (sin filtrar)",
+                title="Señal ECG",
                 xaxis_title="Tiempo [s]",
                 yaxis_title="ECG (V)",
                 template="plotly_white",
