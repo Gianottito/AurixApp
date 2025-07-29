@@ -179,6 +179,9 @@ elif seccion == "🧠 Señal ECG":
             # Convertir datos crudos del ADC a voltios
             df_ecg['ecg'] = ((df_ecg['ecg'] / 4095.0) * 3.3)
 
+            # Centrar la señal en 0
+            df_ecg['ecg'] = df_ecg['ecg'] - df_ecg['ecg'].mean()
+
             # Downsampling para mostrar máximo 1000 puntos
             factor_downsample = max(1, len(df_ecg) // 1000)
             df_plot = downsample(df_ecg[['timestamp_s', 'ecg']], factor_downsample)
