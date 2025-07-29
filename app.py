@@ -158,7 +158,7 @@ if seccion == "📈 Frecuencia Cardíaca":
                   (historial['Fecha'] == nueva_entrada['Fecha'])).any()
 
         if not existe:
-            historial = historial.append(nueva_entrada, ignore_index=True)
+            historial = pd.concat([historial, pd.DataFrame([nueva_entrada])], ignore_index=True)
             historial.to_csv(archivo_historial, index=False)
             
 # ---------------- SECCIÓN 2: ECG ----------------
