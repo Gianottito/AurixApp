@@ -28,7 +28,7 @@ def mostrar_logo(path_logo):
     )
 
 mostrar_logo("logoaurix.png")
-st.title("---Plataforma de Análisis Cardíaco---")
+st.title("Plataforma de Análisis Cardíaco")
 
 # ---------------- Sidebar para navegación ----------------
 st.sidebar.title("Navegación")
