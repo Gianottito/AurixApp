@@ -206,7 +206,7 @@ elif seccion == "🧠 Señal ECG":
 elif seccion == "🗂️ Historial de Pacientes":
     st.header("🗂️ Historial de pacientes cargados")
 
- if os.path.exists(archivo_historial):
+    if os.path.exists(archivo_historial):
         historial = pd.read_csv(archivo_historial)
     else:
         historial = pd.DataFrame(columns=["Nombre", "Edad", "Fecha", "Observaciones"])
