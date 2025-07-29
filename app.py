@@ -24,7 +24,7 @@ def mostrar_logo(path_logo):
     )
 
 mostrar_logo("logoaurix.png")
-st.title("Aurix - Plataforma de Análisis Cardíaco")
+st.title("Plataforma de Análisis Cardíaco")
 
 # ---------------- Sidebar para navegación ----------------
 st.sidebar.title("Navegación")
@@ -182,5 +182,28 @@ elif seccion == "🗂️ Historial de Pacientes":
 
     st.dataframe(historial, use_container_width=True)
 
+    st.markdown("---")
+    st.subheader("Descarga de informes individuales")
 
+    carpeta_pdfs = "./informes_pacientes/"
+
+    for i, paciente in historial.iterrows():
+        nombre_archivo = f"{paciente['Nombre'].replace(' ', '_')}_{paciente['Fecha']}.pdf"
+        ruta_pdf = os.path.join(carpeta_pdfs, nombre_archivo)
+
+        st.markdown(f"**Paciente:** {paciente['Nombre']}  \n**Fecha:** {paciente['Fecha']}  \n**Observaciones:** {paciente['Observaciones']}")
+        
+        if os.path.exists(ruta_pdf):
+            with open(ruta_pdf, "rb") as f:
+                pdf_bytes = f.read()
+            st.download_button(
+                label="📥 Descargar PDF",
+                data=pdf_bytes,
+                file_name=nombre_archivo,
+                mime="application/pdf"
+            )
+        else:
+            st.warning("PDF no disponible para este paciente.")
+
+        st.markdown("---")
 
