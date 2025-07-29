@@ -67,15 +67,14 @@ if seccion == "📈 Frecuencia Cardíaca":
         max_fc = df['frecuencia_cardíaca'].max()
         avg_fc = df['frecuencia_cardíaca'].mean()
         total = len(df)
-        en_arritmia = df[df['frecuencia_cardíaca'] > 70].shape[0]
+        en_arritmia = df[df['frecuencia_cardíaca'] > 100].shape[0]
         carga_arritmica = (en_arritmia / total) * 100 if total > 0 else 0
 
         st.markdown(f"""
-        ### 📊 Estadísticas
-        - 🔻 Frecuencia mínima: {min_fc:.2f} lpm  
+        ### 📊 Estadísticas  
         - 🔺 Frecuencia máxima: {max_fc:.2f} lpm  
         - 📈 Frecuencia promedio: {avg_fc:.2f} lpm  
-        - ❤️ Carga arrítmica (>70 lpm): {carga_arritmica:.2f} %
+        - ❤️ Carga arrítmica: {carga_arritmica:.2f} %
         """)
 
         # Gráfico interactivo
