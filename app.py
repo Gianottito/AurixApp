@@ -10,6 +10,10 @@ import tempfile
 import base64
 import os
 
+# Crear carpeta para informes si no existe
+if not os.path.exists("informes_pacientes"):
+    os.makedirs("informes_pacientes")
+
 # Función para mostrar logo
 def mostrar_logo(path_logo):
     with open(path_logo, "rb") as image_file:
@@ -24,7 +28,7 @@ def mostrar_logo(path_logo):
     )
 
 mostrar_logo("logoaurix.png")
-st.title("Plataforma de Análisis Cardíaco")
+st.title("    Plataforma de Análisis Cardíaco")
 
 # ---------------- Sidebar para navegación ----------------
 st.sidebar.title("Navegación")
@@ -44,6 +48,10 @@ def aplicar_filtro_bandpass(data, fs, lowcut=0.5, highcut=15):
 
 def downsample(df, factor):
     return df.iloc[::factor, :].reset_index(drop=True)
+    
+# Archivo para guardar historial
+archivo_historial = "historial_pacientes.csv"
+carpeta_pdfs = "./informes_pacientes/"
 
 # ---------------- SECCIÓN 1: FRECUENCIA CARDÍACA ----------------
 if seccion == "📈 Frecuencia Cardíaca":
@@ -118,6 +126,11 @@ if seccion == "📈 Frecuencia Cardíaca":
         tmp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
         pdf.output(tmp_pdf.name)
 
+        # Guardar PDF en carpeta con nombre consistente
+        nombre_pdf = f"{nombre_paciente.replace(' ', '_')}_{datetime.now().date()}.pdf"
+        ruta_pdf = os.path.join(carpeta_pdfs, nombre_pdf)
+        pdf.output(ruta_pdf)
+
         with open(tmp_pdf.name, "rb") as f:
             st.download_button(
                 label="📥 Descargar informe PDF",
@@ -126,6 +139,28 @@ if seccion == "📈 Frecuencia Cardíaca":
                 mime="application/pdf",
             )
 
+                # Guardar paciente en historial (persistencia)
+        if os.path.exists(archivo_historial):
+            historial = pd.read_csv(archivo_historial)
+        else:
+            historial = pd.DataFrame(columns=["Nombre", "Edad", "Fecha", "Observaciones"])
+
+        # Nueva entrada con fecha de hoy para el historial
+        nueva_entrada = {
+            "Nombre": nombre_paciente,
+            "Edad": edad_paciente,
+            "Fecha": datetime.now().date().strftime("%Y-%m-%d"),
+            "Observaciones": observaciones,
+        }
+
+        # Para evitar duplicados, chequeamos si ya está
+        existe = ((historial['Nombre'] == nueva_entrada['Nombre']) & 
+                  (historial['Fecha'] == nueva_entrada['Fecha'])).any()
+
+        if not existe:
+            historial = historial.append(nueva_entrada, ignore_index=True)
+            historial.to_csv(archivo_historial, index=False)
+            
 # ---------------- SECCIÓN 2: ECG ----------------
 elif seccion == "🧠 Señal ECG":
     st.header("🧠 Visualización de señal ECG")
@@ -171,25 +206,25 @@ elif seccion == "🧠 Señal ECG":
 elif seccion == "🗂️ Historial de Pacientes":
     st.header("🗂️ Historial de pacientes cargados")
 
-    # Simulación de pacientes cargados previamente
-    historial = pd.DataFrame([
-        {"Nombre": "Juan Pérez", "Edad": 58, "Fecha": "2025-06-25", "Observaciones": "Control estable"},
-        {"Nombre": "Ana García", "Edad": 63, "Fecha": "2025-06-28", "Observaciones": "Revisión post tratamiento"},
-    ])
+ if os.path.exists(archivo_historial):
+        historial = pd.read_csv(archivo_historial)
+    else:
+        historial = pd.DataFrame(columns=["Nombre", "Edad", "Fecha", "Observaciones"])
 
-    st.dataframe(historial, use_container_width=True)
+    if len(historial) > 0:
+        st.dataframe(historial, use_container_width=True)
+    else:
+        st.info("No hay pacientes cargados aún.")
 
     st.markdown("---")
     st.subheader("Descarga de informes individuales")
-
-    carpeta_pdfs = "./informes_pacientes/"
 
     for i, paciente in historial.iterrows():
         nombre_archivo = f"{paciente['Nombre'].replace(' ', '_')}_{paciente['Fecha']}.pdf"
         ruta_pdf = os.path.join(carpeta_pdfs, nombre_archivo)
 
         st.markdown(f"**Paciente:** {paciente['Nombre']}  \n**Fecha:** {paciente['Fecha']}  \n**Observaciones:** {paciente['Observaciones']}")
-        
+
         if os.path.exists(ruta_pdf):
             with open(ruta_pdf, "rb") as f:
                 pdf_bytes = f.read()
