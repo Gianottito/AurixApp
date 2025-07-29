@@ -22,8 +22,6 @@ def mostrar_logo(path_logo):
         f"""
         <div style="text-align: center; margin-bottom: 20px;">
             <img src="data:image/png;base64,{encoded}" width="400"/>
-            <h1 style="margin-top: 10px; color: #00aaff;">AuriX</h1>
-            <h3 style="color: white;">Plataforma de Análisis Cardíaco</h3>
         </div>
         """,
         unsafe_allow_html=True
