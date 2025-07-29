@@ -111,7 +111,7 @@ if seccion == "📈 Frecuencia Cardíaca":
             pdf.ln(5)
         pdf.cell(0, 10, f"Frecuencia máxima: {max_fc:.2f} lpm", ln=True)
         pdf.cell(0, 10, f"Frecuencia promedio: {avg_fc:.2f} lpm", ln=True)
-        pdf.cell(0, 10, f"Carga arrítmica (>70 lpm): {carga_arritmica:.2f} %", ln=True)
+        pdf.cell(0, 10, f"Carga arrítmica: {carga_arritmica:.2f} %", ln=True)
         pdf.ln(5)
         pdf.image(tmp_img.name, x=10, w=190)
 
