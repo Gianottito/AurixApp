@@ -64,7 +64,6 @@ if seccion == "📈 Frecuencia Cardíaca":
         df = df.dropna(subset=['fecha']).sort_values('fecha')
 
         # Estadísticas
-        min_fc = df['frecuencia_cardíaca'].min()
         max_fc = df['frecuencia_cardíaca'].max()
         avg_fc = df['frecuencia_cardíaca'].mean()
         total = len(df)
