@@ -46,8 +46,8 @@ seccion = st.sidebar.selectbox("Ir a:", ["📈 Frecuencia Cardíaca", "🧠 Señ
 #    b, a = butter_bandpass(lowcut, highcut, fs)
 #    return filtfilt(b, a, data)
 
-#def downsample(df, factor):
-#    return df.iloc[::factor, :].reset_index(drop=True)
+def downsample(df, factor):
+    return df.iloc[::factor, :].reset_index(drop=True)
     
 # Archivo para guardar historial
 archivo_historial = "historial_pacientes.csv"
@@ -244,6 +244,7 @@ elif seccion == "🗂️ Historial de Pacientes":
             st.warning("PDF no disponible para este paciente.")
 
         st.markdown("---")
+
 
 
 
