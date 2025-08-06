@@ -183,7 +183,7 @@ elif seccion == "🧠 Señal ECG":
             df_ecg['ecg'] = df_ecg['ecg'] - df_ecg['ecg'].mean()
             
             # Aplicar filtro pasa banda (0.5 a 40 Hz)
-            df_ecg['ecg'] = aplicar_filtro_bandpass(df_ecg['ecg'], fs)
+            #df_ecg['ecg'] = aplicar_filtro_bandpass(df_ecg['ecg'], fs)
 
             # Downsampling para mostrar máximo 1000 puntos
             factor_downsample = max(1, len(df_ecg) // 1000)
@@ -244,5 +244,6 @@ elif seccion == "🗂️ Historial de Pacientes":
             st.warning("PDF no disponible para este paciente.")
 
         st.markdown("---")
+
 
 
