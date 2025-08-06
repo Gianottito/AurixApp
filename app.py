@@ -35,19 +35,19 @@ st.sidebar.title("Navegación")
 seccion = st.sidebar.selectbox("Ir a:", ["📈 Frecuencia Cardíaca", "🧠 Señal ECG", "🗂️ Historial de Pacientes"])
 
 # ---------------- Función filtro bandpass ----------------
-def butter_bandpass(lowcut, highcut, fs, order=2):
-    nyq = 0.5 * fs
-    low = lowcut / nyq
-    high = highcut / nyq
-    return butter(order, [low, high], btype='band')
+#def butter_bandpass(lowcut, highcut, fs, order=2):
+#    nyq = 0.5 * fs
+#    low = lowcut / nyq
+#    high = highcut / nyq
+#    return butter(order, [low, high], btype='band')
 
-@st.cache_data(show_spinner=False)
-def aplicar_filtro_bandpass(data, fs, lowcut=0.5, highcut=40):
-    b, a = butter_bandpass(lowcut, highcut, fs)
-    return filtfilt(b, a, data)
+#@st.cache_data(show_spinner=False)
+#def aplicar_filtro_bandpass(data, fs, lowcut=0.5, highcut=40):
+#    b, a = butter_bandpass(lowcut, highcut, fs)
+#    return filtfilt(b, a, data)
 
-def downsample(df, factor):
-    return df.iloc[::factor, :].reset_index(drop=True)
+#def downsample(df, factor):
+#    return df.iloc[::factor, :].reset_index(drop=True)
     
 # Archivo para guardar historial
 archivo_historial = "historial_pacientes.csv"
@@ -244,4 +244,5 @@ elif seccion == "🗂️ Historial de Pacientes":
             st.warning("PDF no disponible para este paciente.")
 
         st.markdown("---")
+
 
