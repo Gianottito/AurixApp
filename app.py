@@ -200,7 +200,7 @@ elif seccion == "🧠 Señal ECG":
             fig_ecg.update_layout(
                 title="Señal ECG",
                 xaxis_title="Tiempo [s]",
-                yaxis_title="ECG (V)",
+                yaxis_title="ECG (mV)",
                 template="plotly_white",
                 width=1000,
                 hovermode="x unified"
@@ -246,6 +246,7 @@ elif seccion == "🗂️ Historial de Pacientes":
             st.warning("PDF no disponible para este paciente.")
 
         st.markdown("---")
+
 
 
 
