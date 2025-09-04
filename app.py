@@ -177,7 +177,9 @@ elif seccion == "🧠 Señal ECG":
             df_ecg['timestamp_s'] = df_ecg['timestamp_ms'] / 1000.0
 
             # Convertir datos crudos del ADC a voltios
-            df_ecg['ecg'] = ((df_ecg['ecg'] / 4095.0) * 3.3)
+            GANANCIA_TOTAL = 1100  # Instrumentación (100) × Op-Amp (11)
+            df_ecg['ecg'] = ((df_ecg['ecg'] / 4095.0) * 3.3 * 1000) / GANANCIA_TOTAL
+           # df_ecg['ecg'] = ((df_ecg['ecg'] / 4095.0) * 3.3)
 
             # Centrar la señal en 0
             df_ecg['ecg'] = df_ecg['ecg'] - df_ecg['ecg'].mean()
@@ -244,6 +246,7 @@ elif seccion == "🗂️ Historial de Pacientes":
             st.warning("PDF no disponible para este paciente.")
 
         st.markdown("---")
+
 
 
 
