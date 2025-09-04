@@ -178,8 +178,7 @@ elif seccion == "🧠 Señal ECG":
 
             # ---------------- Conversión ADC -> mV fisiológicos ----------------
             VREF = 3.3
-            GANANCIA_TOTAL = 1100  # Instrumentación (100) × Op-Amp (11)
-
+            
             # ADC -> voltios en salida del amplificador
             ecg_volt = (df_ecg['ecg'] / 4095.0) * VREF
 
@@ -187,7 +186,7 @@ elif seccion == "🧠 Señal ECG":
             ecg_volt_centrada = ecg_volt - ecg_volt.median()
 
             # Pasar a mV fisiológicos dividiendo por la ganancia total
-            df_ecg['ecg'] = (ecg_volt_centrada * 1000.0) / GANANCIA_TOTAL
+            df_ecg['ecg'] = (ecg_volt_centrada * 1000.0) 
             # -------------------------------------------------------------------
 
             # Downsampling para mostrar máximo 1000 puntos
@@ -255,6 +254,7 @@ elif seccion == "🗂️ Historial de Pacientes":
             st.warning("PDF no disponible para este paciente.")
 
         st.markdown("---")
+
 
 
 
