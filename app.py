@@ -176,16 +176,19 @@ elif seccion == "🧠 Señal ECG":
             # Convertir timestamp a segundos
             df_ecg['timestamp_s'] = df_ecg['timestamp_ms'] / 1000.0
 
-            # Convertir datos crudos del ADC a voltios
+            # ---------------- Conversión ADC -> mV fisiológicos ----------------
+            VREF = 3.3
             GANANCIA_TOTAL = 1100  # Instrumentación (100) × Op-Amp (11)
-            df_ecg['ecg'] = ((df_ecg['ecg'] / 4095.0) * 3.3 * 1000) / GANANCIA_TOTAL
-           # df_ecg['ecg'] = ((df_ecg['ecg'] / 4095.0) * 3.3)
 
-            # Centrar la señal en 0
-            df_ecg['ecg'] = df_ecg['ecg'] - df_ecg['ecg'].mean()
-            
-            # Aplicar filtro pasa banda (0.5 a 40 Hz)
-            #df_ecg['ecg'] = aplicar_filtro_bandpass(df_ecg['ecg'], fs)
+            # ADC -> voltios en salida del amplificador
+            ecg_volt = (df_ecg['ecg'] / 4095.0) * VREF
+
+            # Quitar offset (centrar en 0 usando la mediana)
+            ecg_volt_centrada = ecg_volt - ecg_volt.median()
+
+            # Pasar a mV fisiológicos dividiendo por la ganancia total
+            df_ecg['ecg'] = (ecg_volt_centrada * 1000.0) / GANANCIA_TOTAL
+            # -------------------------------------------------------------------
 
             # Downsampling para mostrar máximo 1000 puntos
             factor_downsample = max(1, len(df_ecg) // 1000)
@@ -195,19 +198,25 @@ elif seccion == "🧠 Señal ECG":
             fig_ecg = go.Figure()
             fig_ecg.add_trace(go.Scattergl(
                 x=df_plot["timestamp_s"], y=df_plot["ecg"],
-                name="Señal original", line=dict(color="red", width=1)
+                name="Señal ECG", line=dict(color="red", width=1)
             ))
             fig_ecg.update_layout(
                 title="Señal ECG",
                 xaxis_title="Tiempo [s]",
-                yaxis_title="ECG (mV)",
+                yaxis_title="ECG (mV)",  # ahora en milivoltios reales
                 template="plotly_white",
                 width=1000,
                 hovermode="x unified"
             )
             st.plotly_chart(fig_ecg, use_container_width=True)
+
+            # Mostrar amplitud máxima como referencia
+            amp_max = df_ecg['ecg'].abs().max()
+            st.caption(f"Amplitud máxima estimada: {amp_max:.1f} mV")
+
         else:
             st.error("Las columnas esperadas ('timestamp_ms' y 'ecg') no están presentes.")
+
 
 
 # ---------------- SECCIÓN 3: HISTORIAL ----------------
@@ -246,6 +255,7 @@ elif seccion == "🗂️ Historial de Pacientes":
             st.warning("PDF no disponible para este paciente.")
 
         st.markdown("---")
+
 
 
 
